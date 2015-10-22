@@ -1,0 +1,153 @@
+[1mdiff --git a/app/src/main/AndroidManifest.xml b/app/src/main/AndroidManifest.xml[m
+[1mindex 3c13459..033a705 100644[m
+[1m--- a/app/src/main/AndroidManifest.xml[m
+[1m+++ b/app/src/main/AndroidManifest.xml[m
+[36m@@ -8,12 +8,11 @@[m
+         android:label="@string/app_name"[m
+         android:theme="@style/AppTheme" >[m
+         <activity[m
+[31m-            android:name=".test.ylf.com.NinthGridActivity"[m
+[32m+[m[32m            android:name=".MainActivity"[m
+             android:label="@string/app_name" >[m
+             <intent-filter>[m
+                 <action android:name="android.intent.action.MAIN" />[m
+ [m
+[31m-                <category android:name="android.intent.category.LAUNCHER" />[m
+             </intent-filter>[m
+         </activity>[m
+     </application>[m
+[1mdiff --git a/app/src/main/java/test/ylf/com/viewtest/MainActivity.java b/app/src/main/java/test/ylf/com/viewtest/MainActivity.java[m
+[1mindex f84853d..aa77b2c 100644[m
+[1m--- a/app/src/main/java/test/ylf/com/viewtest/MainActivity.java[m
+[1m+++ b/app/src/main/java/test/ylf/com/viewtest/MainActivity.java[m
+[36m@@ -8,9 +8,18 @@[m [mimport android.graphics.PixelFormat;[m
+ import android.graphics.Rect;[m
+ import android.graphics.drawable.Drawable;[m
+ import android.os.Bundle;[m
+[32m+[m[32mimport android.text.Html;[m
+[32m+[m[32mimport android.text.Spannable;[m
+[32m+[m[32mimport android.text.SpannableString;[m
+[32m+[m[32mimport android.text.Spanned;[m
+[32m+[m[32mimport android.text.TextPaint;[m
+[32m+[m[32mimport android.text.style.URLSpan;[m
+[32m+[m[32mimport android.util.Log;[m
+ import android.view.View;[m
+ import android.widget.EditText;[m
+ import android.widget.ImageView;[m
+[32m+[m[32mimport android.widget.TextView;[m
+[32m+[m
+ import com.lidroid.xutils.ViewUtils;[m
+ import com.lidroid.xutils.util.LogUtils;[m
+ import com.lidroid.xutils.view.annotation.ViewInject;[m
+[36m@@ -20,19 +29,77 @@[m [mimport java.io.ByteArrayInputStream;[m
+ import java.io.ByteArrayOutputStream;[m
+ import java.io.IOException;[m
+ import java.io.InputStream;[m
+[32m+[m[32mimport java.net.URI;[m
+[32m+[m[32mimport java.net.URISyntaxException;[m
+ [m
+ public class MainActivity extends Activity {[m
+     @ViewInject(R.id.et_input)[m
+     private EditText input;[m
+     @ViewInject(R.id.iv)[m
+     private ImageView iv;[m
+[32m+[m[32m    @ViewInject(R.id.tv)[m
+[32m+[m[32m    private TextView tv;[m
+ [m
+     @Override[m
+     protected void onCreate(Bundle savedInstanceState) {[m
+         super.onCreate(savedInstanceState);[m
+         setContentView(R.layout.activity_main);[m
+         ViewUtils.inject(this);[m
+[31m-        initView();[m
+[32m+[m[32m        Spanned charSequence=Html.[m
+[32m+[m[32m        fromHtml("<img id=\"qqmail_send_skyscraper_showed\" src=\"https://stockweb.mail.qq.com/201508/06/bcymq_qss_201508060905.jpg?pdomain=wa.gtimg.com\" width=\"550\" height=\"100\" onload=\"getTop().AD.handleImgSucc('qqmail_send_skyscraper', window)\" onerror=\"getTop().AD.handleImgError('qqmail_send_skyscraper', window)\">", new Html.ImageGetter() {[m
+[32m+[m[32m            @Override[m
+[32m+[m[32m            public Drawable getDrawable(String source) {[m
+[32m+[m[32m                int identifier = getResources().getIdentifier(source, "drawable", getPackageName());[m
+[32m+[m[32m                Log.e("identifier", "identifier=" + identifier);[m
+[32m+[m[32m                Drawable drawable = getResources().getDrawable(identifier);[m
+[32m+[m[32m                drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());[m
+[32m+[m[32m                return null;[m
+[32m+[m[32m            }[m
+[32m+[m[32m        }, null);[m
+[32m+[m[32m        SpannableString spanStr = new SpannableString(charSequence);[m
+[32m+[m
+[32m+[m[32m        URLSpan[] urlspans = spanStr.getSpans(0, spanStr.length(), URLSpan.class);[m
+[32m+[m[32m        for (URLSpan urlspan : urlspans)[m
+[32m+[m[32m        {[m
+[32m+[m[32m            Log.d("url", "url="+urlspan.getURL());[m
+[32m+[m[32m            spanStr.setSpan(new URLSpan(urlspan.getURL()){[m
+[32m+[m[32m                @Override[m
+[32m+[m[32m                public void updateDrawState(TextPaint ds) {[m
+[32m+[m[32m                    super.updateDrawState(ds);[m
+[32m+[m[32m                    //设置删除线[m
+[32m+[m[32m                    ds.setFlags(TextPaint.STRIKE_THRU_TEXT_FLAG);[m
+[32m+[m[32m                    //设置下划线[m
+[32m+[m[32m                    ds.setUnderlineText(true);[m
+[32m+[m[32m                    //设置颜色[m
+[32m+[m[32m                    ds.setColor(0xfff90202);[m
+[32m+[m[32m                }[m
+[32m+[m[32m                @Override[m
+[32m+[m[32m                public void onClick(View widget) {[m
+[32m+[m[32m                    Log.e("widget", "url="+getURL());[m
+[32m+[m[32m                    try {[m
+[32m+[m[32m                        URI uri = new URI(getURL());[m
+[32m+[m[32m                        if("http".equalsIgnoreCase(uri.getScheme()) || "https".equalsIgnoreCase(uri.getScheme()))[m
+[32m+[m[32m                        {[m
+[32m+[m[32m                            //网络请求[m
+[32m+[m[32m                        }else if("tel".equalsIgnoreCase(uri.getScheme())){[m
+[32m+[m[32m                            //电话[m
+[32m+[m[32m                        }[m
+[32m+[m[32m                        else if("mailto".equalsIgnoreCase(uri.getScheme()))[m
+[32m+[m[32m                        {[m
+[32m+[m[32m                            //邮箱[m
+[32m+[m[32m                        }else if("page".equalsIgnoreCase(uri.getScheme())){[m
+[32m+[m[32m                            //Activity 跳转[m
+[32m+[m[32m                        }[m
+[32m+[m[32m                    } catch (URISyntaxException e) {[m
+[32m+[m[32m                        e.printStackTrace();[m
+[32m+[m[32m                    }[m
+[32m+[m[32m                }[m
+[32m+[m
+[32m+[m[32m            }, spanStr.getSpanStart(urlspan), spanStr.getSpanEnd(urlspan), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);[m
+[32m+[m[32m        }[m
+[32m+[m[32m        tv.setText(spanStr);[m
+[32m+[m
+[32m+[m[32m        // initView();[m
+     }[m
+     @OnClick(R.id.btn_search)[m
+     public  void onSearch(View view){[m
+[36m@@ -64,6 +131,9 @@[m [mpublic class MainActivity extends Activity {[m
+ [m
+     }[m
+ [m
+[32m+[m[32m    //  文字  图片      我 @[m
+[32m+[m[32m    //  text:      image:[m
+[32m+[m
+ [m
+     public InputStream  createInputStream(Drawable drawable){[m
+         Bitmap bm=Bitmap.createBitmap(drawable.getIntrinsicWidth(),drawable.getIntrinsicHeight(),drawable.getOpacity()!= PixelFormat.OPAQUE?Bitmap.Config.ARGB_8888:Bitmap.Config.RGB_565);[m
+[1mdiff --git a/app/src/main/res/layout/activity_main.xml b/app/src/main/res/layout/activity_main.xml[m
+[1mindex 3851ee7..8c6d4ad 100644[m
+[1m--- a/app/src/main/res/layout/activity_main.xml[m
+[1m+++ b/app/src/main/res/layout/activity_main.xml[m
+[36m@@ -20,11 +20,18 @@[m
+             android:id="@+id/btn_search"[m
+             android:text="搜索"/>[m
+     </LinearLayout>[m
+[32m+[m[32m    <TextView[m
+[32m+[m[32m        android:layout_width="wrap_content"[m
+[32m+[m[32m        android:layout_height="wrap_content"[m
+[32m+[m[32m        android:layout_centerInParent="true"[m
+[32m+[m[32m        android:id="@+id/tv"[m
+[32m+[m[32m        />[m
+    <ImageView[m
+        android:layout_width="wrap_content"[m
+        android:layout_height="wrap_content"[m
+        android:layout_centerInParent="true"[m
+        android:id="@+id/iv"[m
+[32m+[m[32m       android:visibility="gone"[m
+        />[m
+ [m
+ </RelativeLayout>[m
